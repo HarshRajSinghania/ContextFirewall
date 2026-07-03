@@ -8,10 +8,13 @@ at per-memory granularity (the headline of the hackathon's forget() theme).
 from __future__ import annotations
 
 import inspect
+import logging
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 from .bootstrap import configure_cognee
 from .recall import MEMORY_COLLECTION
+
+logger = logging.getLogger("contextfirewall.forget")
 
 
 def _entry_id(entry: Any) -> str:
@@ -124,6 +127,7 @@ async def _find_memory_node_id(memory_id: str) -> Tuple[Optional[str], Any]:
         try:
             nodes, _edges = await engine.get_graph_data()
         except Exception:  # noqa: BLE001
+            logger.warning("forget: get_graph_data failed while locating memory %s", memory_id, exc_info=True)
             return None, engine
         for entry in nodes:
             nid, props = entry if isinstance(entry, tuple) else (entry.get("id"), entry)
@@ -160,6 +164,7 @@ async def forget_memory(
                 memory_props = props or {}
                 break
     except Exception:  # noqa: BLE001
+        logger.warning("forget: could not read graph data for memory %s (node %s)", memory_id, node_id, exc_info=True)
         memory_props = {}
 
     namespace = str((memory_props or {}).get("namespace") or "demo")
@@ -185,7 +190,7 @@ async def forget_memory(
             await engine.delete_nodes([node_id])
             deleted["graph"] = True
     except Exception:  # noqa: BLE001
-        pass
+        logger.error("forget: graph node delete failed for memory %s (node %s)", memory_id, node_id, exc_info=True)
 
     # Vector embedding delete (otherwise the stale memory resurfaces in recall).
     try:
@@ -198,7 +203,7 @@ async def forget_memory(
                 await res
             deleted["vector"] = True
     except Exception:  # noqa: BLE001
-        pass
+        logger.error("forget: vector embedding delete failed for memory %s (node %s)", memory_id, node_id, exc_info=True)
 
     ok = deleted["graph"] or deleted["vector"]
     cleanup_done = False
@@ -214,9 +219,9 @@ async def forget_memory(
                         for did in sorted(cleanup_ids):
                             await engine.delete_node(did)
                 except Exception:  # noqa: BLE001
-                    pass
+                    logger.warning("forget: orphan cleanup delete failed for memory %s (ids %s)", memory_id, sorted(cleanup_ids), exc_info=True)
         except Exception:  # noqa: BLE001
-            pass
+            logger.warning("forget: orphan-node computation failed after forgetting memory %s", memory_id, exc_info=True)
     return {
         "memory_id": memory_id,
         "status": "forgotten" if ok else "error",

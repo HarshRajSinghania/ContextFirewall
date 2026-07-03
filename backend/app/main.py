@@ -26,6 +26,7 @@ in the environment to enable them; without it, destructive paths are disabled.
 from __future__ import annotations
 
 import json
+import logging
 import os
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -61,6 +62,8 @@ from app.models import (
     TimelineResponse,
 )
 
+logger = logging.getLogger("contextfirewall.api")
+
 # data/ lives under backend/, not backend/app/, so resolve from the backend dir.
 DEMO_SESSION = Path(__file__).resolve().parents[1] / "data" / "sessions" / "taskflow_onboarding.json"
 
@@ -71,7 +74,7 @@ async def lifespan(app: FastAPI):
     try:
         configure_cognee()
     except Exception:  # noqa: BLE001
-        pass
+        logger.exception("startup: configure_cognee() failed; first request will retry cold")
     # Run the MCP streamable-HTTP session manager for the life of the app. The MCP
     # app is mounted at /mcp; mounted ASGI sub-apps do not get their lifespan run
     # automatically, so we drive the session manager here.
@@ -86,9 +89,15 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+# CORS: defaults to "*" for the public demo API (no credentials, so wildcard is
+# safe). Operators can lock it down to specific origins with a comma-separated
+# CF_ALLOWED_ORIGINS (e.g. "https://contextfirewall.vercel.app").
+_cors_env = os.environ.get("CF_ALLOWED_ORIGINS", "*").strip()
+_allowed_origins = ["*"] if _cors_env in ("", "*") else [o.strip() for o in _cors_env.split(",") if o.strip()]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # public demo API
+    allow_origins=_allowed_origins,
     allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -311,7 +320,7 @@ async def _reset_memory() -> None:
         await cognee.prune.prune_data()
         await cognee.prune.prune_system(graph=True, vector=True, metadata=True)
     except Exception:  # noqa: BLE001
-        pass
+        logger.error("reset: Cognee prune failed; stores may be partially wiped", exc_info=True)
 
 
 @app.post("/reset")
@@ -327,6 +336,7 @@ async def _demo_already_seeded() -> bool:
         counts = await count_nodes()
         return int(counts.get("Memory", 0)) > 0
     except Exception:  # noqa: BLE001
+        logger.warning("seed: could not count nodes to check demo state; assuming not seeded", exc_info=True)
         return False
 
 
@@ -345,7 +355,7 @@ async def _ensure_demo_rules() -> None:
         res = await improve_memory({"demo"}, rules_namespace="demo")
         log_activity("api", "improve_rules", res.get("message", "distilled demo rules"))
     except Exception:  # noqa: BLE001
-        pass
+        logger.warning("seed: demo rules self-heal (improve) failed; rules are best-effort on top of seed", exc_info=True)
 
 
 @app.post("/demo/seed", response_model=IngestResponse)
