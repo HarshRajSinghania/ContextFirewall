@@ -1,9 +1,23 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
-const mono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono", display: "swap" });
+// Self-hosted (next/font/local) rather than next/font/google: the Google
+// provider fetches font CSS/binaries from fonts.googleapis.com at build time,
+// which hangs `next build` on network-restricted hosts (locked-down CI). These
+// variable woff2 files are vendored under app/fonts/, so the build needs no network.
+const inter = localFont({
+  src: "./fonts/inter.woff2",
+  variable: "--font-inter",
+  display: "swap",
+  weight: "100 900",
+});
+const mono = localFont({
+  src: "./fonts/jetbrains-mono.woff2",
+  variable: "--font-mono",
+  display: "swap",
+  weight: "100 800",
+});
 
 const SITE = "https://contextfirewall.vercel.app";
 const OG_IMAGE =
