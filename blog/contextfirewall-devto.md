@@ -16,9 +16,9 @@ The moment an agent can remember, it can also remember *wrong* — and confident
 
 **ContextFirewall** is one small idea taken seriously: *audit every remembered fact before it reaches the next agent.* And because the agents people actually use speak the **Model Context Protocol (MCP)**, I shipped it as an MCP server. Point Claude Code, Cursor, or Windsurf at one endpoint, and from then on every memory the agent recalls, stores, distils, or forgets flows through **Cognee** and four firewall checks first.
 
-![ContextFirewall live console — remember, recall, improve, forget](https://raw.githubusercontent.com/himanshu748/ContextFirewall/main/.github/assets/demo.gif)
+{% embed https://youtu.be/leq4av3xfFM %}
 
-*▶ [60-second narrated walkthrough, with sound](https://raw.githubusercontent.com/himanshu748/ContextFirewall/main/.github/assets/demo_sound.mp4) · real console, real Cognee calls, no mocks.*
+*▶ 60-second narrated walkthrough — real console, live Cognee calls, no mocks.*
 
 ## Connect in one line
 

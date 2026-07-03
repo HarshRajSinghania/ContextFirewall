@@ -24,9 +24,9 @@ Every memory your agent recalls, stores, distils, or forgets flows through [Cogn
 
 ### ▶ See it work — the four Cognee verbs, live
 
-<a href="https://github.com/himanshu748/ContextFirewall/raw/main/.github/assets/demo_sound.mp4"><img src=".github/assets/demo.gif" alt="ContextFirewall demo — remember, recall, improve, forget on the live console" width="90%"></a>
+<a href="https://youtu.be/leq4av3xfFM"><img src=".github/assets/demo.gif" alt="ContextFirewall demo — remember, recall, improve, forget on the live console" width="90%"></a>
 
-<sub>▲ real console, real Cognee calls (Neo4j · Postgres · pgvector · Qwen2.5-72B) — no mocks · **[🔊 narrated walkthrough — 60s, with sound ↗](https://github.com/himanshu748/ContextFirewall/raw/main/.github/assets/demo_sound.mp4)** · [silent MP4 ↗](https://github.com/himanshu748/ContextFirewall/raw/main/.github/assets/demo.mp4) · [40s brand teaser ↗](https://github.com/himanshu748/ContextFirewall/raw/main/.github/assets/launch.mp4)</sub>
+<sub>▲ real console, real Cognee calls (Neo4j · Postgres · pgvector · Qwen2.5-72B) — no mocks · **[🔊 Watch the narrated walkthrough on YouTube ↗](https://youtu.be/leq4av3xfFM)** · [download MP4 ↗](https://github.com/himanshu748/ContextFirewall/raw/main/.github/assets/demo_sound.mp4) · [40s brand teaser ↗](https://github.com/himanshu748/ContextFirewall/raw/main/.github/assets/launch.mp4)</sub>
 
 </div>
 
