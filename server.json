@@ -1,0 +1,40 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-09-29/server.schema.json",
+  "name": "io.github.himanshu748/contextfirewall",
+  "description": "Trust firewall for AI coding-agent memory: audits remembered facts before they reach your agent.",
+  "repository": {
+    "url": "https://github.com/himanshu748/ContextFirewall",
+    "source": "github"
+  },
+  "version": "0.1.0",
+  "packages": [
+    {
+      "registryType": "pypi",
+      "identifier": "contextfirewall-mcp",
+      "version": "0.1.0",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "CF_API_BASE",
+          "description": "ContextFirewall API base URL. Point this at your own instance so your memories and your inference spend stay yours. Defaults to the public read-only demo.",
+          "isRequired": false,
+          "isSecret": false
+        },
+        {
+          "name": "CF_API_KEY",
+          "description": "ContextFirewall API key (cf_live_...). Scopes reads and writes to your private namespace. Without it the server talks to the read-only demo.",
+          "isRequired": false,
+          "isSecret": true
+        },
+        {
+          "name": "CF_HTTP_TIMEOUT",
+          "description": "Request timeout in seconds. Defaults to 120.",
+          "isRequired": false,
+          "isSecret": false
+        }
+      ]
+    }
+  ]
+}
