@@ -61,6 +61,16 @@ def _anonymous() -> Identity:
     return Identity(kind="anon", namespace=PUBLIC_NAMESPACE, can_write=False, read_namespaces={DEMO_NAMESPACE})
 
 
+def llm_checks_allowed(ident: Identity) -> bool:
+    """Whether this caller may trigger the LLM-backed checks.
+
+    Those checks run on the deployment's own inference token, so an anonymous
+    caller on the public demo gets the deterministic checks only and cannot
+    spend the host's credits.
+    """
+    return ident.kind != "anon"
+
+
 _pool = None
 
 

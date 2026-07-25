@@ -35,7 +35,7 @@ from fastapi import FastAPI, Header, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.activity import get_activity, log_activity
-from app.identity import resolve_identity
+from app.identity import llm_checks_allowed, resolve_identity
 from app.cognee_runtime.bootstrap import configure_cognee
 from app.cognee_runtime.forget import forget_memory
 from app.cognee_runtime.graph import count_nodes, graph_view, list_sessions, session_timeline
@@ -211,7 +211,12 @@ async def ingest(req: IngestRequest, authorization: Optional[str] = Header(defau
 @app.post("/audit", response_model=AuditResponse)
 async def audit(req: AuditRequest, authorization: Optional[str] = Header(default=None)) -> AuditResponse:
     ident = await resolve_identity(authorization)
-    result = await audit_memories(req.query, top_k=req.top_k, namespaces=ident.read_namespaces)
+    result = await audit_memories(
+        req.query,
+        top_k=req.top_k,
+        use_llm=llm_checks_allowed(ident),
+        namespaces=ident.read_namespaces,
+    )
     response = AuditResponse(**result)
     log_activity(
         "api",
@@ -224,7 +229,12 @@ async def audit(req: AuditRequest, authorization: Optional[str] = Header(default
 @app.post("/pack", response_model=PackResponse)
 async def pack(req: PackRequest, authorization: Optional[str] = Header(default=None)) -> PackResponse:
     ident = await resolve_identity(authorization)
-    result = await build_pack(req.query, top_k=req.top_k, namespaces=ident.read_namespaces)
+    result = await build_pack(
+        req.query,
+        top_k=req.top_k,
+        use_llm=llm_checks_allowed(ident),
+        namespaces=ident.read_namespaces,
+    )
     response = PackResponse(
         query=result["query"],
         pack_markdown=result["pack_markdown"],

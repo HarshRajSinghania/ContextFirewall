@@ -3,11 +3,19 @@ from __future__ import annotations
 import asyncio
 
 from app.identity import (
+    Identity,
     bearer_token,
     hash_api_key,
+    llm_checks_allowed,
     looks_like_api_key,
     resolve_identity,
 )
+
+
+def test_anonymous_callers_cannot_spend_the_host_inference_budget():
+    assert llm_checks_allowed(Identity(kind="apikey")) is True
+    assert llm_checks_allowed(Identity(kind="admin")) is True
+    assert llm_checks_allowed(Identity(kind="anon")) is False
 
 
 def test_hash_api_key_is_stable_sha256_hex():
